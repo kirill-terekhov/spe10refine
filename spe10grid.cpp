@@ -206,7 +206,8 @@ int main(int argc, char *argv[])
 	scale_permiability_x = scale_permiability_y=scale_permiability_z = 1;
 
 
-	
+	if( argc > 3 ) refines = atoi(argv[3]);
+		
 
 	mesh = new Mesh();
 	mesh->SetCommunicator(INMOST_MPI_COMM_WORLD);
@@ -229,7 +230,6 @@ int main(int argc, char *argv[])
 
 		if( argc > 1 ) incline = atoi(argv[1]);
 		if( argc > 2) tetra = atoi(argv[2]);
-		if( argc > 3 ) refines = atoi(argv[3]);
 		if( argc > 4 ) x_beg = atoi(argv[4]);
 		if( argc > 5 ) x_end = atoi(argv[5]);
 		if( argc > 6 ) y_beg = atoi(argv[6]);
@@ -393,7 +393,7 @@ int main(int argc, char *argv[])
 		if( !mesh->GetProcessorRank() ) std::cout << "Compactify data." << std::endl;
 		mesh->ReorderEmpty(CELL|FACE|EDGE|NODE);
 		if( !mesh->GetProcessorRank() ) std::cout << "Done." << std::endl;
-		mesh->Barrier();
+		//mesh->Barrier();
 	}
 #endif
 	//refine
@@ -426,7 +426,7 @@ int main(int argc, char *argv[])
 				std::cout << "Faces: " << nfaces << "." << std::endl;
 				std::cout << "Cells: " << ncells << "." << std::endl;
 			}
-			mesh->Barrier();
+			//mesh->Barrier();
 		}
 	}
 	if( !mesh->GetProcessorRank() ) std::cout << "Saving the grid into \"grid" << (mesh->GetProcessorsNumber() > 1 ? ".pvtk" : ".vtk") << "\"." << std::endl;
