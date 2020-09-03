@@ -380,6 +380,9 @@ int main(int argc, char *argv[])
 #if defined(USE_PARTITIONER)
 	if( mesh->GetProcessorsNumber() > 1 )
 	{
+		if( !mesh->GetProcessorRank() ) std::cout << "Resolve shared elements." << std::endl;
+		mesh->ResolveShared();
+		if( !mesh->GetProcessorRank() ) std::cout << "Done." << std::endl;
 		if( !mesh->GetProcessorRank() ) std::cout << "Partition the mesh." << std::endl;
 		Partitioner p(mesh);
 		p.SetMethod(Partitioner::INNER_KMEANS,Partitioner::Partition);
@@ -393,6 +396,7 @@ int main(int argc, char *argv[])
 		if( !mesh->GetProcessorRank() ) std::cout << "Compactify data." << std::endl;
 		mesh->ReorderEmpty(CELL|FACE|EDGE|NODE);
 		if( !mesh->GetProcessorRank() ) std::cout << "Done." << std::endl;
+		std::cout << "Number of cells on " << mesh->GetProcessorRank() << " is " << mesh->NumberOf(CELL) << std::endl;
 		//mesh->Barrier();
 	}
 #endif
@@ -413,8 +417,10 @@ int main(int argc, char *argv[])
 			for(Mesh::iteratorCell it = mesh->BeginCell(); it != mesh->EndCell(); ++it)
 				indicator[*it] = 1;
 			if( !mesh->GetProcessorRank() ) std::cout << "Start refine." << std::endl;
+			double t = Timer();
 			refiner.Refine(indicator);
-			if( !mesh->GetProcessorRank() ) std::cout << "Done." << std::endl;
+			t = Timer() - t;
+			if( !mesh->GetProcessorRank() ) std::cout << "Done in " << t << "s." << std::endl;
 			unsigned ncells = mesh->TotalNumberOf(CELL);
 			unsigned nnodes = mesh->TotalNumberOf(NODE);
 			unsigned nedges = mesh->TotalNumberOf(EDGE);
