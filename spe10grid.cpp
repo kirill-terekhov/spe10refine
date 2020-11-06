@@ -407,11 +407,12 @@ int main(int argc, char *argv[])
 		Model transdata(aut);
 		CopySpe10Data copy(tporo,tK);
 		transdata.AddSubModel("copy",copy);
-		AdaptiveMesh refiner(*mesh);
-		refiner.SetModel(&transdata);
 		TagInteger indicator = mesh->CreateTag("indicator",DATA_INTEGER,CELL,NONE,1);
 		for(int q = 0; q < refines; ++q)
 		{
+			AdaptiveMesh refiner(*mesh);
+			refiner.SetModel(&transdata);
+		
 			if( !mesh->GetProcessorRank() ) std::cout << "Refinement cycle " << q+1 << "/" << refines << "." << std::endl;
 			//all cells to be refined
 			for(Mesh::iteratorCell it = mesh->BeginCell(); it != mesh->EndCell(); ++it)
@@ -432,6 +433,8 @@ int main(int argc, char *argv[])
 				std::cout << "Faces: " << nfaces << "." << std::endl;
 				std::cout << "Cells: " << ncells << "." << std::endl;
 			}
+			
+			refiner.ClearData();
 			//mesh->Barrier();
 		}
 	}
